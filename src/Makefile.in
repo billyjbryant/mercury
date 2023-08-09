@@ -169,12 +169,12 @@ libmerc_util: libmerc_util.cc libmerc_api.h
 intercept_server: intercept_server.cc
 	$(CXX) $(CFLAGS) intercept_server.cc -std=c++17 -o intercept_server
 
-tls_scanner: tls_scanner.cc libmerc
+tls_scanner: tls_scanner.cc libmerc.a libmerc/crypto_hash.hpp libmerc/verbosity.hpp libmerc/tls_connection.hpp
 	$(CXX) $(CFLAGS) tls_scanner.cc libmerc/libmerc.a -pthread -lssl -lcrypto -lz -o tls_scanner
 
 batch_gcd: CFLAGS += -march=native -flto
 batch_gcd: batch_gcd.cc
-	$(CXX) $(CFLAGS) batch_gcd.cc -Bdynamic -lgmpxx -lgmp -pthread -o batch_gcd
+	$(CXX) $(CFLAGS) batch_gcd.cc libmerc/asn1.cc libmerc/asn1/oid.cc -Bdynamic -lgmpxx -lgmp -pthread -o batch_gcd
 
 cert_analyze: cert_analyze.cc libmerc/asn1.h
 	$(CXX) $(CFLAGS) cert_analyze.cc libmerc/asn1.cc libmerc/asn1/oid.cc -pthread -lcrypto -o cert_analyze
@@ -308,14 +308,20 @@ MSV ="-DMERCURY_SEMANTIC_VERSION=$(major),$(minor),$(patch)"
 .PHONY: increment-patchlevel increment-minor-version increment-major-version
 increment-patchlevel:
 	echo $(major).$(minor).$(shell expr $(patch) + 1) > ../VERSION
+	git add ../VERSION
+	git commit -m "incrementing patchlevel"
 	git tag -a $(major).$(minor).$(shell expr $(patch) + 1) -m "\"patchlevel increment\""
 
 increment-minor-version:
 	echo $(major).$(shell expr $(minor) + 1).0 > ../VERSION
+	git add ../VERSION
+	git commit -m "incrementing minor version"
 	git tag -a $(major).$(shell expr $(minor) + 1).0 -m "\"minor version increment\""
 
 increment-major-version:
 	echo $(shell expr $(major) + 1).0.0 > ../VERSION
+	git add ../VERSION
+	git commit -m "incrementing major version"
 	git tag -a $(shell expr $(major) + 1).0.0 -m "\"major version increment\""
 
 # EOF

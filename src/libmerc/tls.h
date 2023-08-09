@@ -11,7 +11,7 @@
 #include "fingerprint.h"
 #include "match.h"
 #include "analysis.h"
-#include "tcp.h"
+#include "protocol.h"
 #include "tcpip.h"
 
 
@@ -334,7 +334,7 @@ struct tls_extensions : public datum {
 };
 
 
-struct tls_client_hello : public tcp_base_protocol {
+struct tls_client_hello : public base_protocol {
     struct datum protocol_version;
     struct datum random;
     struct datum session_id;
@@ -373,7 +373,7 @@ struct tls_client_hello : public tcp_base_protocol {
 
 #include "match.h"
 
-struct tls_server_hello : public tcp_base_protocol {
+struct tls_server_hello : public base_protocol {
     struct datum protocol_version;
     struct datum random;
     struct datum ciphersuite_vector;
@@ -431,7 +431,7 @@ struct tls_server_hello : public tcp_base_protocol {
 
 };
 
-class tls_server_hello_and_certificate : public tcp_base_protocol {
+class tls_server_hello_and_certificate : public base_protocol {
     struct tls_server_hello hello;
     struct tls_server_certificate certificate;
 

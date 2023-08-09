@@ -5,6 +5,7 @@
 #define STUN_H
 
 #include "datum.h"
+#include "protocol.h"
 #include "json_object.h"
 #include "util_obj.h"      // for utf8_string
 #include "match.h"
@@ -152,7 +153,7 @@ namespace stun {
             if (family == addr_family::ipv4) {
                 datum tmp{x_address};
                 encoded<uint32_t> addr{tmp};
-                addr = htonl(addr ^ magic);
+                addr = hton(addr ^ magic);
                 o.print_key_ipv4_addr("x_address", (uint8_t *)&addr); // TODO: byte order???
             } else {
                 o.print_key_hex("x_address", x_address); // TODO: handle IPv6
@@ -530,7 +531,7 @@ namespace stun {
 
     };
 
-    class message {
+    class message : public base_protocol {
         header hdr;
         datum body;
 

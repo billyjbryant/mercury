@@ -135,7 +135,7 @@ TLS fingerprints are formed from packets containing a TLS Client Hello message. 
 The "tls/1" fingerprint format is
 
 ```
-   "tls/1" (TLS_Version) (TLS_Ciphersuite) [ QUIC_Extension* ]
+   "tls/1" (TLS_Version) (TLS_Ciphersuite) [ TLS_Extension* ]
 ```
 
 and the older "tls" fingerprint format is
@@ -289,13 +289,13 @@ HTTP_REQUEST_NAME_ONLY = {
 
 ## OPENVPN
 
-OPENVPN fingerprints are computed from the OPENVPN Initial Packet which also contains the TLS Client Hello.   To compute this fingerprint, it is necessary to parse OPENVPN packets (which may be more than one), reassemble the data, and then process the TLS Client Hello in the reassembled data.  If there is no TLS Client Hello in the packets, it is not possible to compute a fingerprint.  The fingerprint format is 
+OPENVPN fingerprints are computed from the OPENVPN Initial Packet which also contains the TLS Client Hello.   To compute this fingerprint, it is necessary to parse OPENVPN packets (which may be more than one), reassemble the data, and then process the TLS Client Hello in the reassembled data.  If there is no TLS Client Hello in the packets, it is not possible to compute a fingerprint.  The fingerprint format is
 
 ```
 "openvpn/" (ip_proto) (num_pkt) ({opcode}{key_id}) (HMAC_len) (TLS_Ciphersuites) ((TLS_Extension)*)
 ```
 
- where 
+ where
 
 - `ip_proto` (string, one byte) is the IP protocol type - 6:TCP, 11:UDP, depending on the transport protocol used for OPENVPN,
 
@@ -309,7 +309,7 @@ OPENVPN fingerprints are computed from the OPENVPN Initial Packet which also con
 
 - `HMAC_len` (string, 1 byte) is the length of HMAC used (e.g 20 for SHA1, 32 for SHA256) if OPENVPN tls-auth is enabled or 0 otherwise,
 
-- `TLS_Version`, `TLS_Ciphersuites`, `TLS_Extension` are as defined in the TLS section.  They are computed from the TLS Client Hello reassembled from the OPENVPN packets.  
+- `TLS_Version`, `TLS_Ciphersuites`, `TLS_Extension` are as defined in the TLS section.  They are computed from the TLS Client Hello reassembled from the OPENVPN packets.
 
 An example of a OPENVPN fingerprint is
 
@@ -320,28 +320,26 @@ openvpn/(06)(03)(0400)(14)(0301)(c014c00ac022c0210039003800880087c00fc0050035008
 
 #### Truncated Fingerprints
 
-A truncated fingerprint, formed from a truncated message, may be analyzed using prefix matching, but should not be analyzed using exact matching.   
+A truncated fingerprint, formed from a truncated message, may be analyzed using prefix matching, but should not be analyzed using exact matching.
 
 
 
 ## Background and Motivation
 
-Several network fingerprinting systems are in use to recognize clients, servers, and operating systems, including [P0F](https://lcamtuf.coredump.cx/p0f3/), [nmap](https://nmap.org/book/man-os-detection.html), [JA3](https://github.com/salesforce/ja3), and [mercury](https://github.com/cisco/mercury).  NPF aims to incorporate their best practices, and provide additional flexibility.  Its goals are: 
+Several network fingerprinting systems are in use to recognize clients, servers, and operating systems, including [P0F](https://lcamtuf.coredump.cx/p0f3/), [nmap](https://nmap.org/book/man-os-detection.html), [JA3](https://github.com/salesforce/ja3), and [mercury](https://github.com/cisco/mercury).  NPF aims to incorporate their best practices, and provide additional flexibility.  Its goals are:
 
-- to enable fingerprint systems to accommodate new protocol extensions and new protocol behaviors, while at the same time being backwards compatible with fingerprints generated according to older specifications, 
+- to enable fingerprint systems to accommodate new protocol extensions and new protocol behaviors, while at the same time being backwards compatible with fingerprints generated according to older specifications,
 - to make it easier to share and automatically process fingerprint data, by explicitly indicating the protocol and the format (selection and normalization rules) fingerprint string,
-- to support approximate and partial matching as well as exact matching, 
-- to provide an optional compact representation with a cryptographically collision-resistant hash function, and 
+- to support approximate and partial matching as well as exact matching,
+- to provide an optional compact representation with a cryptographically collision-resistant hash function, and
 - to facilitate interoperability and exchange between different fingerprinting systems.
 
-A secondary goal is to handle fingerprints generated from truncated protocol messages, which can be caused by the loss of a packet carrying a segment of a data element.  
+A secondary goal is to handle fingerprints generated from truncated protocol messages, which can be caused by the loss of a packet carrying a segment of a data element.
 
 
 
 ## Comparison to Existing Fingerprinting Systems
 
-The JA3 fingerprinting system has a relatively compact representation, consisting of 32 hex characters, but it only applies to TLS, is not reversible, and does not utilize GREASE information.  The original mercury fingerprinting system is reversible, utilizes GREASE, and applies to multiple protocols, but it does not contain an explicit indication of the protocol, and is not compact.  Neither system allows to indicate versioning information that would enable the details of the fingerprinting scheme to adapt over time.  This note defines a fingerprint naming scheme that aims to provide the benefits of both systems, along with explicit information about protocols and versions, drawing inspiration from the [Common Platform Enumeration](https://nvd.nist.gov/products/cpe) naming system [1]. 
-
-The JA3 fingerprinting system has a relatively compact representation, consisting of 32 hex characters, but it only applies to TLS, is not reversible, and does not utilize GREASE information.  The original mercury fingerprinting system is reversible, utilizes GREASE, and applies to multiple protocols, but it does not contain an explicit indication of the protocol, and is not compact.  Neither system allows to indicate versioning information that would enable the details of the fingerprinting scheme to adapt over time.  This note defines a fingerprint naming scheme that aims to provide the benefits of both systems, along with explicit information about protocols and versions, drawing inspiration from the [Common Platform Enumeration](https://nvd.nist.gov/products/cpe) naming system. 
+The JA3 fingerprinting system has a relatively compact representation, consisting of 32 hex characters, but it only applies to TLS, is not reversible, and does not utilize GREASE information.  The original mercury fingerprinting system is reversible, utilizes GREASE, and applies to multiple protocols, but it does not contain an explicit indication of the protocol, and is not compact.  Neither system allows to indicate versioning information that would enable the details of the fingerprinting scheme to adapt over time.  This note defines a fingerprint naming scheme that aims to provide the benefits of both systems, along with explicit information about protocols and versions, drawing inspiration from the [Common Platform Enumeration](https://nvd.nist.gov/products/cpe) naming system.
 
 

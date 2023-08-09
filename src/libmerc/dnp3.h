@@ -16,6 +16,7 @@
 #include "datum.h"
 #include "json_object.h"
 #include "match.h"
+#include "protocol.h"
 
 // DNP3 App Response Header
 //
@@ -486,7 +487,7 @@ public:
         }
 };
 
-class dnp3 {
+class dnp3 : public base_protocol {
     dnp3_link link;
     dnp3_transport transport;
     dnp3_app app;
